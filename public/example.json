@@ -1,0 +1,27 @@
+
+{
+    "base": {
+        "classloader.loadedClasses.count": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the number of classes that are currently loaded in the Java virtual machine.",
+            "displayName": "Current Loaded Class Count",
+            "tags": [
+                [
+                ]
+            ]
+        }
+    },
+    "application": {
+        "org.acme.getting.started.GreetingResource.hello": {
+            "unit": "none",
+            "type": "concurrent gauge",
+            "description": "",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        }
+    }
+}

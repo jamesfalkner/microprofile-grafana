@@ -1,0 +1,28 @@
+{
+  "name": "microprofile-grafana",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "start:dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "tmp": "~0.2.1",
+    "barelog": "~0.2.0",
+    "monaco-editor": "~0.20.0",
+    "body-parser": "^1.19.0",
+    "express": "~4.16.1",
+    "less-middleware": "~3.1.0"
+  },
+  "author": "jfalkner@redhat.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesfalkner/microprofile-grafana.git"
+  },
+  "license": "Apache-2.0",
+  "description": "This web app generates Grafana dashboards from running MicroProfile apps using MicroProfile Metrics",
+  "bugs": {
+    "url": "https://github.com/jamesfalkner/microprofile-grafana/issues"
+  },
+  "homepage": "https://github.com/jamesfalkner/microprofile-grafana",
+  "main": "app.js"
+}

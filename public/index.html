@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MicroProfile Grafana Dashboard Generator</title>
+</head>
+
+<body>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="http://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+    <script src="/node_modules/monaco-editor/min/vs/loader.js"></script>
+    <script src="https://use.fontawesome.com/6dc76513ad.js"></script>
+    <script>
+        var srcEditor, destEditor;
+
+        function pasteExample() {
+            $.ajax({
+                method: 'GET',
+                url: 'example.json',
+                type: 'json'
+            })
+                .done(function (data) {
+                    console.log("result: " + data);
+                    srcEditor.setValue(JSON.stringify(data, null, 2));
+                });
+
+        }
+
+        function copyToClipboard() {
+            destEditor.setSelection(new monaco.Range(0, 0, destEditor.getModel().getLineCount() + 1, 0));
+            destEditor.trigger('source', 'editor.action.clipboardCopyAction');
+        }
+
+        function clearDest() {
+            destEditor.setValue("");
+        }
+
+        require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            srcEditor = monaco.editor.create(document.getElementById('code'), {
+                value: '',
+                language: 'json',
+                fontSize: 16,
+                theme: "vs-dark",
+                roundedSelection: false,
+                scrollBeyondLastLine: false
+
+            });
+
+            destEditor = monaco.editor.create(document.getElementById('result'), {
+                value: '',
+                readOnly: true,
+                language: 'json',
+                fontSize: 16,
+                theme: "vs-dark",
+                roundedSelection: false,
+                scrollBeyondLastLine: false
+            });
+
+        });
+
+        $(document).ready(function () {
+
+
+            $('#button').click(function () {
+                var data = srcEditor.getValue().trim();
+                if (data == null || data == "") {
+                    alert("Forget something?")
+                    return;
+                }
+                $('#clock').html('<i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;&nbsp;');
+                destEditor.setValue('');
+                $.ajax({
+                    type: 'post',
+                    url: '/processRaw',
+                    data: data,
+                    dataType: 'json'
+                })
+                    .done(function (data) {
+                        $('#clock').html('<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;&nbsp;');
+                        destEditor.setValue(JSON.stringify(data, null, 2));
+                    })
+                    .fail(function (xhr, status, error) {
+                        $('#clock').html('<i class="fa fa-remove" aria-hidden="true"></i>&nbsp;&nbsp;');
+                        var errorMessage = xhr.status + ': ' + xhr.statusText
+                        alert('Error - ' + errorMessage);
+                    });
+            });
+        });
+    </script>
+    <h1 class="p-3">
+        MicroProfile Grafana Dashboard Generator
+        <small class="p-3 text-muted">Beautify your demos</small>
+    </h1>
+
+    <div class="p-3" style="width: 60%">
+        <p class="lead">Directions: Paste output from
+            <code>curl -X OPTIONS -H "Accept: application/json" http://localhost:8080/metrics</code>
+            or <a href="#" onclick="pasteExample();">try an example</a>. Then generate it, copy to your clipboard and <a
+                href="https://grafana.com/docs/grafana/latest/reference/export_import/#importing-a-dashboard">paste as a
+                new Grafana Dashboard!</a>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-5">
+
+                <p class="lead">
+                    Paste Code <i class="fa fa-arrow-down" aria-hidden="true"></i> then &nbsp;&nbsp;<button
+                        class="btn btn-primary" type="button" id="button">Generate ></button>
+                </p>
+                <div id="code" style="width:100%;height:600px;border:1px solid grey"></div>
+            </div>
+
+            <div class="col-5">
+
+                <p class="lead">
+                    <span id="clock"></span>Resulting Grafana Dashboard &nbsp;&nbsp;
+                    <button onclick="copyToClipboard();" class="btn btn-primary" type="clear" id="clear">Copy to
+                        Clipboard <i class="fa fa-arrow-copy" aria-hidden="true"></i></button>
+                    <button onclick="clearDest();" class="btn btn-danger" type="clear" id="clear">Clear</button>
+                </p>
+
+                <div id="result" style="width:100%;height:600px;border:1px solid grey"></div>
+            </div>
+
+        </div>
+    </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,387 @@
+
+{
+    "base": {
+        "REST.request": {
+            "unit": "nanoseconds",
+            "type": "simple timer",
+            "description": "The number of invocations and total response time of this RESTful resource method since the start of the server.",
+            "displayName": "REST.request",
+            "tags": [
+                [
+                    "class=org.acme.getting.started.GreetingResource",
+                    "method=hello"
+                ]
+            ]
+        },
+        "classloader.loadedClasses.count": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the number of classes that are currently loaded in the Java virtual machine.",
+            "displayName": "Current Loaded Class Count",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "classloader.loadedClasses.total": {
+            "unit": "none",
+            "type": "counter",
+            "description": "Displays the total number of classes that have been loaded since the Java virtual machine has started execution.",
+            "displayName": "Total Loaded Class Count",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "classloader.unloadedClasses.total": {
+            "unit": "none",
+            "type": "counter",
+            "description": "Displays the total number of classes unloaded since the Java virtual machine has started execution.",
+            "displayName": "Total Unloaded Class Count",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "cpu.availableProcessors": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the number of processors available to the Java virtual machine. This value may change during a particular invocation of the virtual machine.",
+            "displayName": "Available Processors",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "cpu.processCpuLoad": {
+            "unit": "percent",
+            "type": "gauge",
+            "description": "Displays  the \"recent cpu usage\" for the Java Virtual Machine process. This value is a double in the [0.0,1.0] interval. A value of 0.0 means that none of the CPUs were running threads from the JVM process during the recent period of time observed, while a value of 1.0 means that all CPUs were actively running threads from the JVM 100% of the time during the recent period being observed. Threads from the JVM include the application threads as well as the JVM internal threads. All values betweens 0.0 and 1.0 are possible depending of the activities going on in the JVM process and the whole system. If the Java Virtual Machine recent CPU usage is not available, the method returns a negative value.",
+            "displayName": "Process CPU load",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "cpu.systemLoadAverage": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the system load average for the last minute. The system load average is the sum of the number of runnable entities queued to the available processors and the number of runnable entities running on the available processors averaged over a period of time. The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average. If the load average is not available, a negative value is displayed. This attribute is designed to provide a hint about the system load and may be queried frequently. The load average may be unavailable on some platforms where it is expensive to implement this method.",
+            "displayName": "System Load Average",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "gc.time": {
+            "unit": "milliseconds",
+            "type": "counter",
+            "description": "Displays the approximate accumulated collection elapsed time in milliseconds. This attribute displays -1 if the collection elapsed time is undefined for this collector. The Java virtual machine implementation may use a high resolution timer to measure the elapsed time. This attribute may display the same value even if the collection count has been incremented if the collection elapsed time is very short.",
+            "displayName": "Garbage Collection Time",
+            "tags": [
+                [
+                    "name=G1 Old Generation"
+                ],
+                [
+                    "name=G1 Young Generation"
+                ]
+            ]
+        },
+        "gc.total": {
+            "unit": "none",
+            "type": "counter",
+            "description": "Displays the total number of collections that have occurred. This attribute lists -1 if the collection count is undefined for this collector.",
+            "displayName": "Garbage Collection Count",
+            "tags": [
+                [
+                    "name=G1 Old Generation"
+                ],
+                [
+                    "name=G1 Young Generation"
+                ]
+            ]
+        },
+        "jvm.uptime": {
+            "unit": "milliseconds",
+            "type": "gauge",
+            "description": "Displays the time from the start of the Java virtual machine in milliseconds.",
+            "displayName": "JVM Uptime",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.committedHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of memory in bytes that is committed for the Java virtual machine to use. This amount of memory is guaranteed for the Java virtual machine to use.",
+            "displayName": "Committed Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.maxHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the maximum amount of heap memory in bytes that can be used for memory management. This attribute displays -1 if the maximum heap memory size is undefined. This amount of memory is not guaranteed to be available for memory management if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.",
+            "displayName": "Max Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.usedHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of used heap memory in bytes.",
+            "displayName": "Used Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "thread.count": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the current number of live threads including both daemon and non-daemon threads",
+            "displayName": "Thread Count",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "thread.daemon.count": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the current number of live daemon threads.",
+            "displayName": "Daemon Thread Count",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "thread.max.count": {
+            "unit": "none",
+            "type": "gauge",
+            "description": "Displays the peak live thread count since the Java virtual machine started or peak was reset. This includes daemon and non-daemon threads.",
+            "displayName": "Peak Thread Count",
+            "tags": [
+                [
+                ]
+            ]
+        }
+    },
+    "vendor": {
+        "cpu.processCpuTime": {
+            "unit": "nanoseconds",
+            "type": "gauge",
+            "description": "Displays the CPU time used by the process on which the Java virtual machine is running in nanoseconds. The returned value is of nanoseconds precision but not necessarily nanoseconds accuracy. This method returns -1 if the the platform does not support this operation.",
+            "displayName": "Process CPU time",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "cpu.systemCpuLoad": {
+            "unit": "percent",
+            "type": "gauge",
+            "description": "Displays the \"recent cpu usage\" for the whole system. This value is a double in the [0.0,1.0] interval. A value of 0.0 means that all CPUs were idle during the recent period of time observed, while a value of 1.0 means that all CPUs were actively running 100% of the time during the recent period being observed. All values betweens 0.0 and 1.0 are possible depending of the activities going on in the system. If the system recent cpu usage is not available, the method returns a negative value.",
+            "displayName": "System CPU load",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.committedNonHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of non heap memory in bytes that is committed for the Java virtual machine to use.",
+            "displayName": "Committed Non Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.freePhysicalSize": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of free physical memory in bytes.",
+            "displayName": "Free physical memory size",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.freeSwapSize": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of free swap space in bytes.",
+            "displayName": "Free swap size",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.maxNonHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the maximum amount of used non-heap memory in bytes.",
+            "displayName": "Max Non Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memory.usedNonHeap": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Displays the amount of used non-heap memory in bytes.",
+            "displayName": "Used Non Heap Memory",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "memoryPool.usage": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Current usage of the memory pool denoted by the 'name' tag",
+            "displayName": "Current usage of the memory pool denoted by the 'name' tag",
+            "tags": [
+                [
+                    "name=CodeHeap 'non-nmethods'"
+                ],
+                [
+                    "name=CodeHeap 'non-profiled nmethods'"
+                ],
+                [
+                    "name=Compressed Class Space"
+                ],
+                [
+                    "name=G1 Eden Space"
+                ],
+                [
+                    "name=G1 Old Gen"
+                ],
+                [
+                    "name=G1 Survivor Space"
+                ],
+                [
+                    "name=Metaspace"
+                ]
+            ]
+        },
+        "memoryPool.usage.max": {
+            "unit": "bytes",
+            "type": "gauge",
+            "description": "Peak usage of the memory pool denoted by the 'name' tag",
+            "displayName": "Peak usage of the memory pool denoted by the 'name' tag",
+            "tags": [
+                [
+                    "name=CodeHeap 'non-nmethods'"
+                ],
+                [
+                    "name=CodeHeap 'non-profiled nmethods'"
+                ],
+                [
+                    "name=Compressed Class Space"
+                ],
+                [
+                    "name=G1 Eden Space"
+                ],
+                [
+                    "name=G1 Old Gen"
+                ],
+                [
+                    "name=G1 Survivor Space"
+                ],
+                [
+                    "name=Metaspace"
+                ]
+            ]
+        }
+    },
+    "application": {
+        "org.acme.getting.started.GreetingResource.hello": {
+            "unit": "none",
+            "type": "concurrent gauge",
+            "description": "",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.GreetingResource.my slow timer": {
+            "unit": "nanoseconds",
+            "type": "timer",
+            "description": "How long a thing takes slowly",
+            "displayName": "Slow Time taken to do stuff",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.GreetingResource.timer2": {
+            "unit": "nanoseconds",
+            "type": "timer",
+            "description": "",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.grmeter.GreetingResource": {
+            "unit": "per_second",
+            "type": "meter",
+            "description": "Meter for GreetingResource",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.grmeter.hello": {
+            "unit": "per_second",
+            "type": "meter",
+            "description": "Meter for GreetingResource",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.grmeter.timer": {
+            "unit": "per_second",
+            "type": "meter",
+            "description": "Meter for GreetingResource",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "org.acme.getting.started.grmeter.timer2": {
+            "unit": "per_second",
+            "type": "meter",
+            "description": "Meter for GreetingResource",
+            "displayName": "",
+            "tags": [
+                [
+                ]
+            ]
+        },
+        "with spaces": {
+            "unit": "none",
+            "type": "counter",
+            "description": "How many times hello was called",
+            "displayName": "Number of Hellos",
+            "tags": [
+                [
+                ]
+            ]
+        }
+    }
+}
