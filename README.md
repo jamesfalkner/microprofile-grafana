@@ -32,7 +32,7 @@ If you don't use HomeBrew then check out [these install instructions](https://gi
 
 ## Ensure microprofile app is running
 
-Prometheus will look for metrics at `http://localhost:8080/metrics` so be sure it's running!
+Prometheus will look for metrics at `http://localhost:8080/metrics` so be sure it's running! You can use the sample app (built with [Quarkus](https://quarkus.io) ) if you want to test drive a real app. Run it in a separate terminal with `mvn -f sampleapp quarkus:dev` and then ensure metrics are available at `http://localhost:8080/metrics`.
 
 ## Run prometheus and grafana via `docker`
 
