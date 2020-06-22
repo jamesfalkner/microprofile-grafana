@@ -55,6 +55,7 @@ local newdash = dashboard.new(
     'label_values(base_thread_count{env="$env",job="$job"}, instance)',
     label='Instance',
     refresh='time',
+    multi=true
   )
 );
 
@@ -70,8 +71,8 @@ local getTags(tags, type) =
       )
     );
 
-  if type == 'timer' then std.format('%s%s', ['{{job}} q={{quantile}}/', tagStr])
-  else '{{job}} ' + tagStr;
+  if type == 'timer' then std.format('%s%s', ['{{job}}/{{instance}} q={{quantile}}/', tagStr])
+  else '{{job}}/{{instance}} ' + tagStr;
 
 // map metric name to the OpenMetrics format based on microprofile metrics rules
 local makeOpenMetricName(name, type, unit, scope) =
