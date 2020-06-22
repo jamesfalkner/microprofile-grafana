@@ -3,6 +3,8 @@
 This project presents a web frontend to generate Grafana dashboards that show metrics from
 a MicroProfile application.
 
+![Docker Image CI](https://github.com/jamesfalkner/microprofile-grafana/workflows/Docker%20Image%20CI/badge.svg)
+
 ## Prereqs
 
 You don't need a running prometheus or grafana to generate dashboards using this app, But for those who want to see the actual dashboards in action, you'll need them. See instructions later on for running prometheus and grafana.
