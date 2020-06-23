@@ -1,4 +1,5 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
+local stat = import 'stat.libsonnet';
 local dashboard = grafana.dashboard;
 local row = grafana.row;
 local singlestat = grafana.singlestat;
@@ -7,9 +8,12 @@ local prometheus = grafana.prometheus;
 local template = grafana.template;
 
 // header width, panel width, panel height
-local hh = 2;
-local pw = 6;
-local ph = 6;
+local FULL_WIDTH = 24;
+local HEADER_HEIGHT = 1;
+local HEADER_WIDTH = FULL_WIDTH;
+local PANEL_HEIGHT = 6;
+local PANEL_WIDTH = 6;
+local PANELS_PER_ROW = FULL_WIDTH / PANEL_WIDTH;
 
 // the incoming microprofile metrics spec
 local src = std.extVar('src');
@@ -109,15 +113,15 @@ local addSimple(func, metricObj) =
   local scope = metricObj.scope;
   local unit = src[scope][metricObj.name]['unit'];
   local type = src[scope][metricObj.name]['type'];
-  local tags = src[scope][metricObj.name]['tags'];
-  local desc = src[scope][metricObj.name]['description'];
-  local dispname = src[scope][metricObj.name]['displayName'];
+  local tags = if 'tags' in src[scope][metricObj.name] then src[scope][metricObj.name]['tags'] else [[]];
+  local desc = if 'description' in src[scope][metricObj.name] then src[scope][metricObj.name]['description'] else 'No description for ' + metricObj.name;
+  local dispname = if 'displayName' in src[scope][metricObj.name] then src[scope][metricObj.name]['displayName'] else metricObj.name;
   local omn = makeOpenMetricName(metricObj.name, type, unit, scope);
 
     if metricObj.name != '' then
       func.addPanel(
         (if type == "gauge" && std.findSubstr('memory', metricObj.name) == [] then
-          singlestat.new(
+          stat.new(
               if dispname != "" then dispname else metricObj.name,
               format = (if unit == 'percent' then 'percent' else if std.findSubstr('second', unit) != [] then 's' else 'short'),
               valueFontSize='110%',
@@ -131,7 +135,7 @@ local addSimple(func, metricObj) =
           )
           .addTarget(
               prometheus.target(
-              omn + '{env="$env",job="$job",instance=~`[[instance]]`}',
+              omn + '{env="$env",job="$job",instance=~"$instance"}',
               datasource='$PROMETHEUS_DS',
               legendFormat=getTags(tags, type)
             )
@@ -157,15 +161,15 @@ local addSimple(func, metricObj) =
           )
           .addTarget(
               prometheus.target(
-              omn + '{env="$env",job="$job",instance=~`[[instance]]`}',
+              omn + '{env="$env",job="$job",instance=~"$instance"}',
               datasource='$PROMETHEUS_DS',
               legendFormat=getTags(tags, type)
               )
           )), gridPos={
               x: metricObj.xpos,
               y: metricObj.ypos,
-              w: 6,
-              h: 6,
+              w: PANEL_WIDTH,
+              h: PANEL_WIDTH,
           }
        )
     else func;
@@ -175,6 +179,8 @@ local vendorMetrics = if std.objectHas(src, 'vendor') then src.vendor else {};
 local appMetrics = if std.objectHas(src, 'application') then src.application else {};
 
 // first start with application metrics header
+local appHeaderStart = 0;
+
 local appdash = newdash.addPanel(
   row.new(
     title='MicroProfile App Metrics',
@@ -182,18 +188,27 @@ local appdash = newdash.addPanel(
     titleSize='h1'
   ), gridPos={
     x: 0,
-    y: 0,
-    w: 24,
-    h: 2
+    y: appHeaderStart,
+    w: FULL_WIDTH,
+    h: HEADER_HEIGHT
   }
 );
 
 // then add application metrics
+local appGridStart = appHeaderStart + HEADER_HEIGHT;
+
 local appformed = std.foldl(addSimple,
-          std.mapWithIndex(function(idx,el) {name: el, xpos: idx%4 * 6, ypos: 2 + (6 * std.floor((idx/4))), scope: 'application'},
+          std.mapWithIndex(function(idx,el) {
+            name: el,
+            xpos: idx%PANELS_PER_ROW * PANEL_WIDTH,
+            ypos: appGridStart + (PANEL_HEIGHT * std.floor((idx/PANELS_PER_ROW))),
+            scope: 'application'
+          },
           std.objectFields(appMetrics)), appdash);
 
 // then add vendor header
+local vendorHeaderStart = appGridStart + (PANEL_HEIGHT * std.ceil(std.length(appMetrics) / PANELS_PER_ROW));
+
 local vendordash = appformed.addPanel(
   row.new(
     title='MicroProfile Vendor Metrics',
@@ -201,18 +216,28 @@ local vendordash = appformed.addPanel(
     titleSize='h1'
   ), gridPos={
     x: 0,
-    y: 2 + (6 * std.ceil(std.length(appMetrics) / 4)),
-    w: 24,
-    h: 2
+    y: vendorHeaderStart,
+    w: FULL_WIDTH,
+    h: HEADER_HEIGHT
   }
 );
 
+
 // and vendor metrics
+local vendorGridStart = vendorHeaderStart + HEADER_HEIGHT;
+
 local vendorformed = std.foldl(addSimple,
-          std.mapWithIndex(function(idx,el) {name: el, xpos: idx%4 * 6, ypos: 2 + (6 * std.ceil(std.length(vendorMetrics) / 4) + 2 + (6 * std.floor((idx/4)))), scope: 'vendor'},
+          std.mapWithIndex(function(idx,el) {
+            name: el,
+            xpos: idx%PANELS_PER_ROW * PANEL_WIDTH,
+            ypos: vendorGridStart + (PANEL_HEIGHT * std.floor((idx/PANELS_PER_ROW))),
+            scope: 'vendor'
+          },
           std.objectFields(vendorMetrics)), vendordash);
 
 // finally base metrics header
+local baseHeaderStart = vendorGridStart + (PANEL_HEIGHT * std.ceil(std.length(vendorMetrics) / PANELS_PER_ROW));
+
 local basedash = vendorformed.addPanel(
   row.new(
     title='MicroProfile Base Metrics',
@@ -220,13 +245,20 @@ local basedash = vendorformed.addPanel(
     titleSize='h1'
   ), gridPos={
     x: 0,
-    y: 2 + (6 * std.ceil(std.length(appMetrics) / 4)) + 2 + (6 * std.ceil(std.length(vendorMetrics) / 4)),
-    w: 24,
-    h: 2
+    y: baseHeaderStart,
+    w: FULL_WIDTH,
+    h: HEADER_HEIGHT
   }
 );
 
 // and add base metrics
+local baseGridStart = baseHeaderStart + HEADER_HEIGHT;
+
 std.foldl(addSimple,
-          std.mapWithIndex(function(idx,el) {name: el, xpos: idx%4 * 6, ypos: 2 + (6 * std.ceil(std.length(appMetrics) / 4)) + 2 + (6 * std.ceil(std.length(vendorMetrics) / 4)) + 2 + (6 * std.floor((idx/4))), scope: 'base'},
+          std.mapWithIndex(function(idx,el) {
+            name: el,
+            xpos: idx%PANELS_PER_ROW * PANEL_WIDTH,
+            ypos: baseGridStart + (PANEL_HEIGHT * std.floor((idx/PANELS_PER_ROW))),
+            scope: 'base'
+          },
           std.objectFields(baseMetrics)), basedash)
