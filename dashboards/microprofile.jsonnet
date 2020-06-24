@@ -4,6 +4,7 @@ local dashboard = grafana.dashboard;
 local row = grafana.row;
 local singlestat = grafana.singlestat;
 local graph = grafana.graphPanel;
+local link = grafana.link;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
@@ -14,16 +15,24 @@ local HEADER_WIDTH = FULL_WIDTH;
 local PANEL_HEIGHT = 6;
 local PANEL_WIDTH = 6;
 local PANELS_PER_ROW = FULL_WIDTH / PANEL_WIDTH;
+local LINKS = [
+        {title: "MicroProfile Home", link: "https://microprofile.io"},
+        {title: "SmallRye Home", link: "https://smallrye.io"}
+      ];
+local DASHBOARD_TITLE = 'SmallRye MicroProfile Metrics %TIMESTAMP%';
+local DASHBOARD_DESC = 'Visualize all MicroProfile Metrics for your MicroProfile application';
+local DASHBOARD_TAGS = ['java', 'microprofile', 'smallrye'];
 
 // the incoming microprofile metrics spec
 local src = std.extVar('src');
 
 local newdash = dashboard.new(
-  'MicroProfile Metrics %TIMESTAMP%',
+    DASHBOARD_TITLE,
+    description = DASHBOARD_DESC,
     refresh='5s',
     time_from='now-5m',
     schemaVersion=16,
-    tags=['java','microprofile'],
+    tags=DASHBOARD_TAGS,
     editable=true
 )
 .addTemplate(
@@ -174,6 +183,21 @@ local addSimple(func, metricObj) =
        )
     else func;
 
+// and add some links to the dashboard
+local addLink(adash, thelink) =
+  adash.addLink(
+    link.dashboards(
+      thelink.title,
+      tags=[],
+      icon='external link',
+      url=thelink.link,
+      targetBlank=true,
+      type='link',
+    )
+  );
+
+local linksdash = std.foldl(addLink, LINKS, newdash);
+
 local baseMetrics = if std.objectHas(src, 'base') then src.base else {};
 local vendorMetrics = if std.objectHas(src, 'vendor') then src.vendor else {};
 local appMetrics = if std.objectHas(src, 'application') then src.application else {};
@@ -181,7 +205,7 @@ local appMetrics = if std.objectHas(src, 'application') then src.application els
 // first start with application metrics header
 local appHeaderStart = 0;
 
-local appdash = newdash.addPanel(
+local appdash = linksdash.addPanel(
   row.new(
     title='MicroProfile App Metrics',
     showTitle=true,
@@ -262,3 +286,4 @@ std.foldl(addSimple,
             scope: 'base'
           },
           std.objectFields(baseMetrics)), basedash)
+
