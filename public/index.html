@@ -36,6 +36,8 @@
 
         function clearDest() {
             destEditor.setValue("");
+            $('#processerr').addClass('d-none');
+
         }
 
         require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
@@ -63,18 +65,70 @@
 
         });
 
+
+        function showErr(msg, temporary) {
+            $('#warnbox').removeClass('d-none').html('<i class="fa fa-2x float-right fa-exclamation-circle" aria-hidden="true"></i>' + msg);
+            if (temporary) {
+                setTimeout(function() {
+                    $('#warnbox').addClass('d-none');
+                }, 5000);
+            }
+        }
+
+        function showProcessingErr(msg, temporary) {
+            $('#processerr').removeClass('d-none').html('<i class="fa fa-2x float-right fa-exclamation-circle" aria-hidden="true"></i>' + msg);
+            if (temporary) {
+                setTimeout(function() {
+                    $('#processerr').addClass('d-none');
+                }, 5000);
+            }
+       }
+
         $(document).ready(function () {
 
             $('#downloadform').submit(function(event) {
-                $('input[name=metrics]').val(srcEditor.getValue().trim());
+                var data = srcEditor.getValue().trim();
+                if (data == null || data == "") {
+                    showErr('Forget something?', true);
+                    console.log("F reak?");
+                    return false;
+                }
+
+                var squigglies = monaco.editor.getModelMarkers(srcEditor);
+                if (squigglies && squigglies.length > 0) {
+                    var msg = "";
+                    squigglies.forEach((err, idx) => {
+                        msg += (err.startLineNumber+ ': ' + err.message);
+                        if (idx < squigglies.length) msg+= '<br>';
+                    });
+                    showErr(msg, false);
+                    return false;
+                }
+
+                $('input[name=metrics]').val(data);
              });
 
             $('#button').click(function () {
+                $('#warnbox').addClass('d-none');
+                $('#processerr').addClass('d-none');
                 var data = srcEditor.getValue().trim();
                 if (data == null || data == "") {
-                    alert("Forget something?")
+                    showErr('Forget something?', true);
                     return;
                 }
+
+                var squigglies = monaco.editor.getModelMarkers(srcEditor);
+                if (squigglies && squigglies.length > 0) {
+                    var msg = "";
+                    squigglies.forEach((err, idx) => {
+                        msg += (err.startLineNumber+ ': ' + err.message);
+                        if (idx < squigglies.length) msg+= '<br>';
+                    });
+                    showErr(msg, false);
+                    return;
+
+                }
+
                 $('#clock').html('<i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;&nbsp;');
                 destEditor.setValue('');
                 $.ajax({
@@ -89,8 +143,8 @@
                     })
                     .fail(function (xhr, status, error) {
                         $('#clock').html('<i class="fa fa-remove" aria-hidden="true"></i>&nbsp;&nbsp;');
-                        var errorMessage = xhr.status + ': ' + xhr.statusText
-                        alert('Error - ' + errorMessage);
+                        var errorMessage = xhr.status + ': ' + xhr.statusText;
+                        showProcessingErr(errorMessage);
                     });
             });
         });
@@ -106,6 +160,8 @@
             or <a href="#" onclick="pasteExample();">try an example</a>. Then generate it, copy to your clipboard and <a
                 href="https://grafana.com/docs/grafana/latest/reference/export_import/#importing-a-dashboard">paste as a
                 new Grafana Dashboard!</a>
+        </p>
+
     </div>
 
     <div class="container-fluid">
@@ -119,6 +175,11 @@
                         class="btn btn-primary" type="button" id="button">Generate Over There ></button> or
                             <button class="btn btn-secondary" type="submit" id="download">Download</button>
                 </p>
+
+                <div class="d-none alert alert-danger" id="warnbox" role="alert">
+                    A simple danger alert—check it out!
+                  </div>
+
                 <input type="hidden" name="metrics"></input>
             </form>
                 <div id="code" style="width:100%;height:600px;border:1px solid grey"></div>
@@ -132,6 +193,11 @@
                         Clipboard <i class="fa fa-arrow-copy" aria-hidden="true"></i></button>
                         <button onclick="clearDest();" class="btn btn-danger" type="clear" id="clear">Clear</button>
                     </p>
+
+
+                    <div class="d-none alert alert-danger" id="processerr" role="alert">
+                        A simple danger alert—check it out!
+                      </div>
 
                 <div id="result" style="width:100%;height:600px;border:1px solid grey"></div>
             </div>
