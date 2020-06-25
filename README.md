@@ -9,7 +9,7 @@ a MicroProfile application.
 
 You don't need a running prometheus or grafana to generate dashboards using this app, But for those who want to see the actual dashboards in action, you'll need them. See instructions later on for running prometheus and grafana.
 
-To run this app locally, you'll need to install [jsonnet]() and [grafonnet]().
+To run this app locally, you'll need to install [jsonnet](https://jsonnet.org/) and [grafonnet](https://grafana.github.io/grafonnet-lib/).
 
 You'll also need `git`, `npm`, `node`, `curl`, etc. To run grafana and prometheus locally you'll need `docker`.
 
