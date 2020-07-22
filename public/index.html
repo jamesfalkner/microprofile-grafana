@@ -34,8 +34,9 @@
             destEditor.trigger('source', 'editor.action.clipboardCopyAction');
         }
 
-        function clearDest() {
-            destEditor.setValue("");
+        function clearEditors() {
+            srcEditor.setValue('');
+            destEditor.setValue('');
             $('#processerr').addClass('d-none');
 
         }
@@ -84,13 +85,30 @@
             }
        }
 
+       function onChooseFile(event) {
+            if (typeof window.FileReader !== 'function')
+                throw ("The file API isn't supported on this browser.");
+            let input = event.target;
+            if (!input)
+                throw ("The browser does not properly implement the event object");
+            if (!input.files)
+                throw ("This browser does not support the `files` property of the file input.");
+            if (!input.files[0])
+                return undefined;
+            let file = input.files[0];
+            let fr = new FileReader();
+            fr.onload = function(event) {
+                srcEditor.setValue(event.target.result);
+            };
+            fr.readAsText(file);
+        }
+
         $(document).ready(function () {
 
             $('#downloadform').submit(function(event) {
                 var data = srcEditor.getValue().trim();
                 if (data == null || data == "") {
                     showErr('Forget something?', true);
-                    console.log("F reak?");
                     return false;
                 }
 
@@ -168,35 +186,34 @@
 
             <div class="col-5">
 
-            <form  style="margin: 0; padding: 0;" id="downloadform" method="post" action="/download">
-                <p class="lead">
-                    Paste Code <i class="fa fa-arrow-down" aria-hidden="true"></i> then &nbsp;&nbsp;<button
-                        class="btn btn-primary" type="button" id="button">Generate Over There ></button> or
-                            <button class="btn btn-secondary" type="submit" id="download">Download</button>
-                </p>
-
+                <div class="lead">
+                    Paste Code <i class="fa fa-arrow-down" aria-hidden="true"></i> or
+                        <input type='file' style="width: 250px" onchange='onChooseFile(event)' />
+                    &nbsp; then &nbsp;<button
+                        class="btn btn-primary" type="button" id="button">Generate ></button>
+                </div>
+                <p></p>
                 <div class="d-none alert alert-danger" id="warnbox" role="alert">
                     A simple danger alert—check it out!
                   </div>
 
-                <input type="hidden" name="metrics"></input>
-            </form>
                 <div id="code" style="width:100%;height:600px;border:1px solid grey"></div>
             </div>
 
             <div class="col-5">
 
-                <p class="lead">
-                    <span id="clock"></span>Resulting Grafana Dashboard &nbsp;&nbsp;
-                    <button onclick="copyToClipboard();" class="btn btn-primary" type="clear" id="clear">Copy to
-                        Clipboard <i class="fa fa-arrow-copy" aria-hidden="true"></i></button>
-                        <button onclick="clearDest();" class="btn btn-danger" type="clear" id="clear">Clear</button>
-                    </p>
+                <div class="lead">
+                    <span id="clock"></span>Resulting Dashboard &nbsp;&nbsp;
+                    <button onclick="copyToClipboard();" class="btn btn-primary" type="clear" id="clear">Copy <i class="fa fa-files-o" aria-hidden="true"></i></button>
+                    <form style="display: inline;" id="downloadform" method="post" action="/download">
+                        <button class="btn btn-secondary" type="submit" id="download">Download <i class="fa fa-download" aria-hidden="true"></i></button>
+                        <input type="hidden" name="metrics"></input>
+                    </form>
+                    <button onclick="clearEditors();" class="btn btn-danger" type="clear" id="clear">Clear <i class="fa fa-trash" aria-hidden="true"></i></button>
+                </div>
+                <p></p>
 
-
-                    <div class="d-none alert alert-danger" id="processerr" role="alert">
-                        A simple danger alert—check it out!
-                      </div>
+                <div class="d-none alert alert-danger" id="processerr" role="alert"></div>
 
                 <div id="result" style="width:100%;height:600px;border:1px solid grey"></div>
             </div>
